@@ -4,7 +4,7 @@ count() { echo $#; }
 
 via_urls ()
 {
-    youtube-dl -f "bestvideo[height<=720]/best[height<=720]" -o "downloads/%(id)s" \
+    yt-dlp -f "bestvideo[height<=720]/best[height<=720]" -o "downloads/%(id)s" \
         --write-info-json --ignore-errors "$@"
     filenames=`python3 url_video_ids.py "downloads/" "$@"`
     localvids=''
@@ -32,7 +32,7 @@ cmd="$1"
 if [ "$cmd" == "sync" ]
 then
     echo "Downloading playlist info..."
-    youtube-dl -j --flat-playlist --playlist-reverse "`cat playlist_url.txt`" \
+    yt-dlp -j --flat-playlist --playlist-reverse "`cat playlist_url.txt`" \
         | jq -r '"https://www.youtube.com/watch?v=\(.id)"' > playlist.txt
     echo "Done"
 elif [ "$cmd" == "local" ]
