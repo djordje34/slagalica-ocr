@@ -40,11 +40,12 @@ def process_image(img):
     scale = cv2.resize(greyscale, (0, 0), None, 5, 5, cv2.INTER_LANCZOS4)
     res, threshold = cv2.threshold(scale, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     kernel = np.ones((5,5), np.uint8)
+    erosion = cv2.dilate(threshold, kernel, iterations = 1)
     erosion = cv2.erode(threshold, kernel, iterations = 1)
     return erosion
 
 def im2str(img):
-    return pytesseract.image_to_string(img, config="--psm 7", lang="srp")
+    return pytesseract.image_to_string(img, config="--psm 7 -c tessedit_char_whitelist=0123456789љњертзуиопасдфгхјклжџцвбнмшђчћжШЂЧЋЖЉЊЕРТЗУИОПАСДФГХЈКЛЖЏЦВБНМQWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm|_ ", lang="srp")
 
 def get_autocrop_coordinates(img, background = None):
     if type(background) == type(None):
@@ -335,6 +336,7 @@ class EpisodeProcessor(object):
                 #print(key)
 
                 val = w
+                val = ''.join([x for x in val if x not in (['|','_','!','?'])])
                 d[key] = val
         outstr = fmt % d
         return outstr
