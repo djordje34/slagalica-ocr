@@ -40,12 +40,17 @@ def process_image(img):
     scale = cv2.resize(greyscale, (0, 0), None, 5, 5, cv2.INTER_LANCZOS4)
     res, threshold = cv2.threshold(scale, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     kernel = np.ones((5,5), np.uint8)
-    erosion = cv2.dilate(threshold, kernel, iterations = 1)
-    erosion = cv2.erode(threshold, kernel, iterations = 1)
-    return erosion
+    #dil = cv2.dilate(threshold, kernel, iterations = 1)
+    #er = cv2.erode(threshold, kernel, iterations = 1)
+    opening = cv2.morphologyEx(threshold, cv2.MORPH_OPEN, kernel, iterations=1)
+    erosion = cv2.erode(opening,kernel,iterations = 1)
+    invert = 255 - erosion
+    cv2.imshow('image',invert)
+    cv2.waitKey(0)
+    return invert
 
 def im2str(img):
-    return pytesseract.image_to_string(img, config="--psm 7 -c tessedit_char_whitelist=0123456789љњертзуиопасдфгхјклжџцвбнмшђчћжШЂЧЋЖЉЊЕРТЗУИОПАСДФГХЈКЛЖЏЦВБНМQWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm|_ ", lang="srp")
+    return pytesseract.image_to_string(img, config="--psm 7 -c tessedit_char_whitelist=љњертзуиопасдфгхјклжџцвбнмшђчћжШЂЧЋЖЉЊЕРТЗУИОПАСДФГХЈКЛЖЏЦВБНМ0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm|_.!=- ", lang="srp")
 
 def get_autocrop_coordinates(img, background = None):
     if type(background) == type(None):
